@@ -15,15 +15,22 @@ Board::Board(int width, int height, int size)
 
 void Board::insertShapeToBoard()
 {
-	for (int i = 0; i < currentShape->getShape().size(); i++) {
-		for (int j = 0; j < currentShape->getShape()[0].size(); j++) {
-			while (currentShape->getXPos() + j < 0) {
-				currentShape->setPos(1, 0);
-			}
-			while (currentShape->getXPos() + j > width - 1) {
-				currentShape->setPos(-1, 0);
-			}
-			if (currentShape->getShape()[j][i] == 1) {
+	// Adjust shape position if it is out of bounds on the X-axis
+    	int shapeWidth = currentShape->getShape()[0].size();
+    	int shapeHeight = currentShape->getShape().size();
+
+	// Ensure the shape is within the horizontal bounds of the board
+	if (currentShape->getXPos() < 0) {
+		currentShape->setPos(-currentShape->getXPos(), 0);
+	}
+	if (currentShape->getXPos() + shapeWidth > width) {
+		currentShape->setPos(width - (currentShape->getXPos() + shapeWidth), 0);
+	}
+	
+	// Insert shape into the board
+	for (int i = 0; i < shapeHeight; i++) {
+		for (int j = 0; j < shapeWidth; j++) {
+			if (currentShape->getShape()[i][j] == 1) {
 				board[currentShape->getXPos() + j][currentShape->getYPos() + i] = 1;
 			}
 		}
