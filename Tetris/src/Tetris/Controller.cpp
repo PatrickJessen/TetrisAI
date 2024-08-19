@@ -21,74 +21,70 @@ void Controller::setCurrentShape(Shape* shape)
 void Controller::moveShape(Direction dir, bool clamp, TetrisState prevState)
 {
 	canUpdate = false;
-	reward = 0.0;
-	board->clearShapeFromBoard();
+    	reward = 0.0;
+    
+    	if (isGameover()) {
+        	board->restart();
+        	return;
+    	}
 
-	if (!isGameover()) {
-		reward++;
-		int posX = 0;
-		int posY = 0;
+    	reward++;  // Increment reward for surviving one more move
+    	int posX = 0;
+    	int posY = 0;
 
-		// Move piece down automatically based on iteration count
-		/*if (currentIterations++ >= movePieceIteration) {
-			currentShape->setPos(0, 1);
-			currentIterations = 0;
+    	// Clear the current shape from the board to update its position
+    	board->clearShapeFromBoard();
 
-		}*/
-		// Handle collision and place the piece if necessary
-		if (hasCollided(currentShape->getXPos(), currentShape->getYPos() + 1)) {
-			placePiece();
-			updateRewards(prevState);
-			canUpdate = true;
-			return;
-		}
+    	// Process input direction and update position/rotation
+    	if (currentShape != nullptr) {
+        	switch (dir) {
+            	case Direction::UP:
+                	currentShape->rotate();
+                	break;
+            	case Direction::DOWN:
+                	posY++;
+                	break;
+            	case Direction::LEFT:
+                	posX--;
+                	break;
+            	case Direction::RIGHT:
+                	posX++;
+                	break;
+            	case Direction::SPACE:
+                	// Drop the piece instantly
+                	while (!hasCollided(currentShape->getXPos(), currentShape->getYPos() + 1)) {
+                    	currentShape->setPos(0, 1);
+                	}
+                	placePiece();
+                	updateRewards(prevState);
+                	canUpdate = true;
+                	return;
+            	default:
+                	break;
+        	}
 
-		// Process input direction
-		if (currentShape != nullptr) {
-			switch (dir) {
-			case Direction::UP:
-				currentShape->rotate();
-				break;
-			case Direction::DOWN:
-				posY++;
-				break;
-			case Direction::LEFT:
-				posX--;
-				break;
-			case Direction::RIGHT:
-				posX++;
-				break;
-			case Direction::SPACE:
-				// Drop the piece instantly
-				while (!hasCollided(currentShape->getXPos(), currentShape->getYPos() + 1)) {
-					currentShape->setPos(0, 1);
-				}
-				placePiece();
-				updateRewards(prevState);
-				canUpdate = true;
-				return;
-			default:
-				break;
-			}
+        // Check collision after moving/rotating the piece and update position if valid
+        if (!hasCollided(currentShape->getXPos() + posX, currentShape->getYPos() + posY)) {
+            currentShape->setPos(posX, posY);
+        }
 
-			// Check collision after moving/rotating the piece
-			if (!hasCollided(currentShape->getXPos() + posX, currentShape->getYPos() + posY)) {
-				currentShape->setPos(posX, posY);
-			}
+        // Update the ghost position (show where the piece would land)
+        currentShape->resetGhostPos();
+        while (!hasCollided(currentShape->getXPos(), currentShape->getGhostYPos() + 1)) {
+            currentShape->setGhostYPos(1);
+        }
 
-			// Update the ghost position
-			currentShape->resetGhostPos();
-			while (!hasCollided(currentShape->getXPos(), currentShape->getGhostYPos() + 1)) {
-				currentShape->setGhostYPos(1);
-			}
+        // Place the shape back on the board
+        board->insertShapeToBoard();
 
-			// Insert the shape back into the board
-			board->insertShapeToBoard();
-		}
-	}
-	else {
-		board->restart();
-	}
+        // If the piece has collided after moving, place it and update rewards
+        if (hasCollided(currentShape->getXPos(), currentShape->getYPos() + 1)) {
+            placePiece();
+            updateRewards(prevState);
+        }
+    }
+
+    canUpdate = true;
 }
 
 const double Controller::getReward(TetrisState previousState)
