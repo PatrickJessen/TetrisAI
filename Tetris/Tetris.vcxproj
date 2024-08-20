@@ -152,9 +152,13 @@
     <ClCompile Include="src\SDL\Core\Sprite.cpp" />
     <ClCompile Include="src\SDL\Render\Renderer.cpp" />
     <ClCompile Include="src\SDL\Window\WindowsWindow.cpp" />
-    <ClCompile Include="src\Tetris\Board.cpp" />
-    <ClCompile Include="src\Tetris\Controller.cpp" />
-    <ClCompile Include="src\Tetris\Shape.cpp" />
+    <ClCompile Include="src\TetrisV2\Board.cpp" />
+    <ClCompile Include="src\TetrisV2\Controller.cpp" />
+    <ClCompile Include="src\TetrisV2\Game.cpp" />
+    <ClCompile Include="src\TetrisV2\Shape.cpp" />
+    <ClCompile Include="src\Tetris\Board1.cpp" />
+    <ClCompile Include="src\Tetris\Controller1.cpp" />
+    <ClCompile Include="src\Tetris\Shape1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Draw.h" />
@@ -168,9 +172,13 @@
     <ClInclude Include="src\SDL\Core\Window.h" />
     <ClInclude Include="src\SDL\Render\Renderer.h" />
     <ClInclude Include="src\SDL\Window\WindowsWindow.h" />
-    <ClInclude Include="src\Tetris\Board.h" />
-    <ClInclude Include="src\Tetris\Controller.h" />
-    <ClInclude Include="src\Tetris\Shape.h" />
+    <ClInclude Include="src\TetrisV2\Board.h" />
+    <ClInclude Include="src\TetrisV2\Controller.h" />
+    <ClInclude Include="src\TetrisV2\Game.h" />
+    <ClInclude Include="src\TetrisV2\Shape.h" />
+    <ClInclude Include="src\Tetris\Board1.h" />
+    <ClInclude Include="src\Tetris\Controller1.h" />
+    <ClInclude Include="src\Tetris\Shape1.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

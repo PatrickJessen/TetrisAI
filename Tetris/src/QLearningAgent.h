@@ -11,93 +11,86 @@
 struct StateHash {
     std::size_t operator()(const TetrisState& state) const {
         std::size_t hash = 0;
-        for (const auto& val : state.grid) {
-            hash_combine(hash, val);
-        }
-        hash_combine(hash, std::hash<int>{}(state.currentPiece));
-        hash_combine(hash, std::hash<int>{}(state.rotationState));
-        for (const auto& height : state.columnHeights) {
-            hash_combine(hash, height);
-        }
-        hash_combine(hash, std::hash<int>{}(state.maxHeight));
-        hash_combine(hash, std::hash<int>{}(state.holes));
-        hash_combine(hash, std::hash<int>{}(state.linesCleared));
-        return hash;
-    }
+        std::hash<int> int_hash;
+        std::hash<float> float_hash;
 
-    inline void hash_combine(std::size_t& seed, const int& v) const {
-        seed ^= std::hash<int>{}(v)+0x9e3779b9 + (seed << 6) + (seed >> 2);
+        // Combine hashes of the heights
+        for (int h : state.heights) {
+            hash ^= int_hash(h) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        }
+
+        // Combine hashes of the height_diffs
+        for (int diff : state.height_diffs) {
+            hash ^= int_hash(diff) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        }
+
+        // Combine hashes of the other attributes
+        hash ^= int_hash(state.num_holes) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        hash ^= int_hash(state.max_height) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        hash ^= int_hash(state.bumpiness) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        hash ^= int_hash(state.lines_cleared) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        hash ^= int_hash(state.landing_height) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+
+        return hash;
     }
 };
 
-template<typename T>
-class QLearningAgent {
+class QLearning {
+private:
+    double alpha; // Learning rate
+    double gamma; // Discount factor
+    double epsilon; // Exploration rate
+    std::unordered_map<TetrisState, std::vector<double>, StateHash> q_table; // Q-table
+    std::mt19937 rng; // Random number generator for epsilon-greedy
+
 public:
-    QLearningAgent(int size, double learningRate, double discountFactor, double epsilon)
-        : size(size), learningRate(learningRate), discountFactor(discountFactor),
-        epsilon(epsilon), rng(std::random_device{}()), dist(0.0, 1.0), dist_action(0, 3) {}
+    QLearning(double alpha, double gamma, double epsilon)
+        : alpha(alpha), gamma(gamma), epsilon(epsilon), rng(std::random_device{}()) {}
 
-    T chooseAction(const TetrisState& state) {
+    // Get the Q-values for a given state
+    std::vector<double>& get_q_values(const TetrisState& state) {
+        if (q_table.find(state) == q_table.end()) {
+            // Initialize Q-values for all possible actions to 0.0
+            q_table[state] = std::vector<double>(get_number_of_actions(), 0.0);
+        }
+        return q_table[state];
+    }
+
+    // Select an action using epsilon-greedy strategy
+    int select_action(const TetrisState& state) {
+        std::uniform_real_distribution<double> dist(0.0, 1.0);
         if (dist(rng) < epsilon) {
-            return static_cast<T>(dist_action(rng));
+            // Exploration: choose a random action
+            std::uniform_int_distribution<int> action_dist(0, get_number_of_actions() - 1);
+            return action_dist(rng);
         }
         else {
-            const auto& qValues = qTable[stateToIndex(state)];
-            return static_cast<T>(std::distance(qValues.begin(),
-                std::max_element(qValues.begin(), qValues.end())));
+            // Exploitation: choose the action with the highest Q-value
+            std::vector<double>& q_values = get_q_values(state);
+            return std::distance(q_values.begin(), std::max_element(q_values.begin(), q_values.end()));
         }
     }
 
-    void updateQValue(const TetrisState& state, T action, double reward, const TetrisState& newState) {
-        epsilon = std::max(minEpsilon, epsilon - epsilonDecay);
-
-        int stateIndex = stateToIndex(state);
-        int newStateIndex = stateToIndex(newState);
-
-        double oldQValue = qTable[stateIndex][static_cast<int>(action)];
-        double maxNextQValue = (newStateIndex != -1) ?
-            *std::max_element(qTable[newStateIndex].begin(), qTable[newStateIndex].end()) : 0.0;
-        qTable[stateIndex][static_cast<int>(action)] = oldQValue +
-            learningRate * (reward + discountFactor * maxNextQValue - oldQValue);
+    // Update Q-value using the Q-learning update rule
+    void update_q_value(const TetrisState& state, int action, double reward, const TetrisState& next_state) {
+        std::vector<double>& q_values = get_q_values(state);
+        double max_next_q_value = *std::max_element(get_q_values(next_state).begin(), get_q_values(next_state).end());
+        q_values[action] += alpha * (reward + gamma * max_next_q_value - q_values[action]);
     }
 
-    double getQValue(const TetrisState& state, int action) const {
-        return qTable[stateToIndex(state)][action];
+    // To be implemented: a function that returns the number of possible actions
+    int get_number_of_actions() const {
+        // Return the number of possible actions (rotations and translations) for a Tetris piece
+        return 4; // Placeholder, depends on Tetris implementation
     }
 
-    void linearDecay(double initialEpsilon, double minEpsilon, double decayRate, int episode) {
-        epsilon = std::max(initialEpsilon - decayRate * episode, minEpsilon);
+    // Save the Q-table to a file (optional)
+    void save_q_table(const std::string& filename) {
+        // Implement saving logic
     }
 
-    void setEpsilon(double val) { epsilon = val; }
-    void setLearningRate(double val) { learningRate = val; }
-
-private:
-    int stateToIndex(const TetrisState& state) {
-        auto it = stateIndexMap.find(state);
-        if (it != stateIndexMap.end()) {
-            return it->second;
-        }
-        else {
-            int newIndex = stateIndexMap.size();
-            stateIndexMap[state] = newIndex;
-            if (newIndex >= qTable.size()) {
-                qTable.emplace_back(5, 0.0); // Dynamically grow Q-table
-            }
-            return newIndex;
-        }
+    // Load the Q-table from a file (optional)
+    void load_q_table(const std::string& filename) {
+        // Implement loading logic
     }
-
-private:
-    std::vector<std::vector<double>> qTable;
-    double learningRate;
-    double discountFactor;
-    double epsilon;
-    std::mt19937 rng;
-    int size;
-    std::uniform_real_distribution<double> dist;
-    std::uniform_int_distribution<int> dist_action;
-    std::unordered_map<TetrisState, int, StateHash> stateIndexMap;
-    double minEpsilon = 0.1;
-    double epsilonDecay = 0.000001;
 };

@@ -6,7 +6,7 @@ SDLController::SDLController(Controller* controller)
 {
 }
 
-void SDLController::Update(Direction dir, TetrisState prevState)
+void SDLController::Update(Direction dir)
 {
 	if (Input::KeyState(Key::S)) {
 		dir = Direction::DOWN;
@@ -23,12 +23,12 @@ void SDLController::Update(Direction dir, TetrisState prevState)
 	if (Input::KeyPressed(Key::W)) {
 		dir = Direction::UP;
 	}
-	controller->moveShape(dir, false, prevState);
+	controller->moveShape(dir);
 }
 
 void SDLController::Update()
 {
-	Direction dir = Direction::NONE;
+	Direction dir = Direction::DOWN;
 	if (Input::KeyState(Key::S)) {
 		dir = Direction::DOWN;
 	}
@@ -44,5 +44,5 @@ void SDLController::Update()
 	if (Input::KeyPressed(Key::W)) {
 		dir = Direction::UP;
 	}
-	//controller->moveShape(dir, false);
+	controller->moveShape(dir);
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "Tetris/Board.h"
+#include "TetrisV2/Board.h"
 
 class Draw
 {

@@ -18,13 +18,13 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tetris\Shape.cpp">
+    <ClCompile Include="src\Tetris\Shape1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tetris\Board.cpp">
+    <ClCompile Include="src\Tetris\Board1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tetris\Controller.cpp">
+    <ClCompile Include="src\Tetris\Controller1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SDL\Core\Input.cpp">
@@ -45,15 +45,27 @@
     <ClCompile Include="src\SDLController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\TetrisV2\Board.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TetrisV2\Shape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TetrisV2\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TetrisV2\Controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Tetris\Shape.h">
+    <ClInclude Include="src\Tetris\Shape1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Tetris\Board.h">
+    <ClInclude Include="src\Tetris\Board1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Tetris\Controller.h">
+    <ClInclude Include="src\Tetris\Controller1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\SDL\Core\Input.h">
@@ -87,6 +99,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\QLearningAgent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TetrisV2\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TetrisV2\Shape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TetrisV2\Controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TetrisV2\Board.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
