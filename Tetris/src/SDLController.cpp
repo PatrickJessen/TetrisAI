@@ -6,43 +6,32 @@ SDLController::SDLController(Controller* controller)
 {
 }
 
-void SDLController::Update(Direction dir)
+void SDLController::Update(Action action)
 {
-	if (Input::KeyState(Key::S)) {
-		dir = Direction::DOWN;
-	}
-	else if (Input::KeyState(Key::A)) {
-		dir = Direction::LEFT;
-	}
-	else if (Input::KeyState(Key::D)) {
-		dir = Direction::RIGHT;
-	}
-	if (Input::KeyPressed(Key::SPACE)) {
-		dir = Direction::SPACE;
-	}
-	if (Input::KeyPressed(Key::W)) {
-		dir = Direction::UP;
-	}
-	controller->moveShape(dir);
+	controller->runEpisode(action);
 }
 
 void SDLController::Update()
 {
-	Direction dir = Direction::DOWN;
-	if (Input::KeyState(Key::S)) {
-		dir = Direction::DOWN;
-	}
-	else if (Input::KeyState(Key::A)) {
-		dir = Direction::LEFT;
-	}
-	else if (Input::KeyState(Key::D)) {
-		dir = Direction::RIGHT;
-	}
-	if (Input::KeyPressed(Key::SPACE)) {
-		dir = Direction::SPACE;
-	}
-	if (Input::KeyPressed(Key::W)) {
-		dir = Direction::UP;
+	Action dir = Action::DOWN;
+	if (currentIterations > maxIterations) {
+		currentIterations = 0;
+		if (Input::KeyState(Key::S)) {
+			dir = Action::DOWN;
+		}
+		else if (Input::KeyState(Key::A)) {
+			dir = Action::LEFT;
+		}
+		else if (Input::KeyState(Key::D)) {
+			dir = Action::RIGHT;
+		}
+		if (Input::KeyPressed(Key::SPACE)) {
+			dir = Action::SPACE;
+		}
+		if (Input::KeyPressed(Key::W)) {
+			dir = Action::UP;
+		}
 	}
 	controller->moveShape(dir);
+	currentIterations++;
 }

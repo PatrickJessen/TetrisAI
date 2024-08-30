@@ -17,6 +17,10 @@ public:
 class Game
 {
 public:
+	Game(std::string gen) {
+		this->gen = gen;
+	}
+public:
 	void update();
 private:
 	void startGame();
@@ -25,5 +29,6 @@ private:
 	void render();
 
 private:
+	std::string gen;
 	bool isRunning;
 };

@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="src\Draw.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\QLearningAgent.cpp" />
     <ClCompile Include="src\SDLController.cpp" />
     <ClCompile Include="src\SDL\Core\Input.cpp" />
     <ClCompile Include="src\SDL\Core\Sprite.cpp" />
@@ -156,11 +157,9 @@
     <ClCompile Include="src\TetrisV2\Controller.cpp" />
     <ClCompile Include="src\TetrisV2\Game.cpp" />
     <ClCompile Include="src\TetrisV2\Shape.cpp" />
-    <ClCompile Include="src\Tetris\Board1.cpp" />
-    <ClCompile Include="src\Tetris\Controller1.cpp" />
-    <ClCompile Include="src\Tetris\Shape1.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\DQN\Matrix.h" />
     <ClInclude Include="src\Draw.h" />
     <ClInclude Include="src\QLearningAgent.h" />
     <ClInclude Include="src\SDLController.h" />
@@ -176,9 +175,7 @@
     <ClInclude Include="src\TetrisV2\Controller.h" />
     <ClInclude Include="src\TetrisV2\Game.h" />
     <ClInclude Include="src\TetrisV2\Shape.h" />
-    <ClInclude Include="src\Tetris\Board1.h" />
-    <ClInclude Include="src\Tetris\Controller1.h" />
-    <ClInclude Include="src\Tetris\Shape1.h" />
+    <ClInclude Include="src\TetrisV2\TetrisState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

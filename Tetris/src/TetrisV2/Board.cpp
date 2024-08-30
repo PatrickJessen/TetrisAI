@@ -1,6 +1,8 @@
 #include "Board.h"
 #include <iostream>
 #include <algorithm>
+#include <numeric>
+#include <array>
 
 Board::Board(int width, int height)
 {
@@ -17,6 +19,7 @@ void Board::initializeBoard()
 
 void Board::insertShapeToBoard(const Shape& shape)
 {
+    previousGrid = grid;
     const auto& shapeMatrix = shape.getShapeMatrix();
     int shapeHeight = shapeMatrix.size();
     int shapeWidth = shapeMatrix[0].size();
@@ -42,7 +45,7 @@ void Board::insertShapeToBoard(const Shape& shape)
 
 int Board::clearLines()
 {
-    int linesCleared = 0;
+    linesCleared = 0;
 
     // Iterate through the rows from bottom to top
     for (int y = height - 1; y >= 0; --y) {
@@ -72,7 +75,6 @@ int Board::clearLines()
             y++;
         }
     }
-
     return linesCleared;
 }
 
@@ -113,6 +115,7 @@ void Board::reset()
 	for (auto& row : grid) {
 		std::fill(row.begin(), row.end(), 0);
 	}
+    gameOver = false;
 }
 
 bool Board::hasCollision(const Shape& shape) const
@@ -181,6 +184,11 @@ void Board::updateBoard(const Shape& shape)
     insertShapeToBoard(shape);
 }
 
+void Board::setGameOver(const bool value)
+{
+    gameOver = value;
+}
+
 void Board::printBoard()
 {
     for (int y = 0; y < height; ++y) {
@@ -195,6 +203,7 @@ void Board::printBoard()
 Shape* Board::getNextShape()
 {
     generateNextShape();
+    currentShape = nextShape;
     return nextShape;
 }
 
@@ -211,6 +220,191 @@ int Board::getHeight() const
 const std::vector<std::vector<int>>& Board::getGrid()
 {
     return grid;
+}
+
+const std::vector<std::vector<int>>& Board::getPreviousGrid()
+{
+    return previousGrid;
+}
+
+TetrisState Board::extractState() const
+{
+    TetrisState state;
+
+    // Calculate the heights of each column
+    std::array<int, 10> heights = { 0 };
+    for (int col = 0; col < width; ++col) {
+        for (int row = 0; row < height; ++row) {
+            if (grid[row][col] != 0) {
+                heights[col] = height - row;
+                break;
+            }
+        }
+    }
+
+    // Calculate aggregate height
+    state.aggregate_height = std::accumulate(heights.begin(), heights.end(), 0);
+
+    // Calculate the number of holes
+    state.holes = 0;
+    for (int col = 0; col < width; ++col) {
+        bool foundBlock = false;
+        for (int row = 0; row < height; ++row) {
+            if (grid[row][col] != 0) {
+                foundBlock = true;
+            }
+            else if (foundBlock && grid[row][col] == 0) {
+                state.holes++;
+            }
+        }
+    }
+
+    // Calculate bumpiness
+    state.bumpiness = 0;
+    for (int col = 0; col < width - 1; ++col) {
+        state.bumpiness += std::abs(heights[col] - heights[col + 1]);
+    }
+
+    // Set the number of lines cleared
+    state.lines_cleared = linesCleared;
+
+    // Optional: Calculate row and column transitions
+    state.row_transitions = 0;
+    state.column_transitions = 0;
+    for (int row = 0; row < height; ++row) {
+        for (int col = 1; col < width; ++col) {
+            if ((grid[row][col] == 0 && grid[row][col - 1] != 0) ||
+                (grid[row][col] != 0 && grid[row][col - 1] == 0)) {
+                state.row_transitions++;
+            }
+        }
+    }
+    for (int col = 0; col < width; ++col) {
+        for (int row = 1; row < height; ++row) {
+            if ((grid[row][col] == 0 && grid[row - 1][col] != 0) ||
+                (grid[row][col] != 0 && grid[row - 1][col] == 0)) {
+                state.column_transitions++;
+            }
+        }
+    }
+
+    return state;
+}
+
+int Board::calculateBumpiness(const std::vector<std::vector<int>>& grid) const
+{
+    int width = grid[0].size();
+    int height = grid.size();
+    std::vector<int> heights(width, 0);
+
+    // Calculate the height of each column
+    for (int col = 0; col < width; ++col) {
+        for (int row = 0; row < height; ++row) {
+            if (grid[row][col] != 0) {
+                heights[col] = height - row;
+                break;
+            }
+        }
+    }
+
+    // Calculate bumpiness as the sum of the absolute differences between adjacent column heights
+    int bumpiness = 0;
+    for (int col = 0; col < width - 1; ++col) {
+        bumpiness += std::abs(heights[col] - heights[col + 1]);
+    }
+
+    return bumpiness;
+}
+
+int Board::calculateAggregateHeight(const std::vector<std::vector<int>>& grid) const
+{
+    int width = grid[0].size();
+    int height = grid.size();
+    int aggregateHeight = 0;
+
+    for (int col = 0; col < width; ++col) {
+        for (int row = 0; row < height; ++row) {
+            if (grid[row][col] != 0) {
+                aggregateHeight += (height - row);
+                break;
+            }
+        }
+    }
+
+    return aggregateHeight;
+}
+
+const bool Board::isGameOver()
+{
+    return gameOver;
+}
+
+bool Board::isPieceOnSolidGround(const Shape& currentShape) const
+{
+    // Get the matrix representation of the current shape
+    const std::vector<std::vector<int>>& shapeMatrix = currentShape.getShapeMatrix();
+    int shapeHeight = shapeMatrix.size();
+    int shapeWidth = shapeMatrix[0].size();
+
+    // Get the current position of the shape on the board
+    int shapeX = currentShape.getXPos();
+    int shapeY = currentShape.getYPos();
+
+    // Iterate through each block in the shape matrix
+    for (int row = 0; row < shapeHeight; ++row) {
+        for (int col = 0; col < shapeWidth; ++col) {
+            // Only check cells that are part of the shape
+            if (shapeMatrix[row][col] != 0) {
+                int boardX = shapeX + col;
+                int boardY = shapeY + row;
+
+                // Check if there's a block below the current block on the board
+                if (grid[boardY + 1][boardX] != 0) {
+                    return true; // There's a block directly below
+                }
+            }
+        }
+    }
+
+    // No blocks below the current piece
+    return false;
+}
+
+int Board::getLinesCleared()
+{
+    return linesCleared;
+}
+
+bool Board::doesPieceFit(const Shape& currentShape, int targetX, int targetY) const
+{
+    // Get the matrix representation of the current shape
+    const std::vector<std::vector<int>>& shapeMatrix = currentShape.getShapeMatrix();
+    int shapeHeight = shapeMatrix.size();
+    int shapeWidth = shapeMatrix[0].size();
+
+    // Iterate through each block in the shape matrix
+    for (int row = 0; row < shapeHeight; ++row) {
+        for (int col = 0; col < shapeWidth; ++col) {
+            // Only check cells that are part of the shape
+            if (shapeMatrix[row][col] != 0) {
+                int boardX = targetX + col;
+                int boardY = targetY + row;
+
+                // Check if the piece is out of bounds
+                if (boardX < 0 || boardX >= grid[0].size() || boardY < 0 || boardY >= grid.size()) {
+                    return false; // The piece is out of bounds
+                }
+
+                // Check if the position on the board is already occupied
+                if (grid[boardY][boardX] != 0) {
+                    return false; // The piece collides with another piece
+                }
+            }
+        }
+    }
+
+    // No collision, the piece fits
+    return true;
 }
 
 void Board::generateNextShape()

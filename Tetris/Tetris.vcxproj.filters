@@ -18,15 +18,6 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tetris\Shape1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tetris\Board1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Tetris\Controller1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\SDL\Core\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -57,17 +48,11 @@
     <ClCompile Include="src\TetrisV2\Controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\QLearningAgent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Tetris\Shape1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tetris\Board1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Tetris\Controller1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\SDL\Core\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -111,6 +96,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\TetrisV2\Board.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TetrisV2\TetrisState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DQN\Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

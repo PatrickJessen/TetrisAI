@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-enum class Direction
+enum class Action
 {
 	UP,
 	DOWN,
@@ -39,19 +39,23 @@ public:
     const std::vector<std::vector<int>> getShapeMatrix() const;
 	int getXPos() const;
 	int getYPos() const;
+	int getRotationState() const;
+	ShapeType getShapeType();
+	void setYPos(const int& value);
+	std::pair<int, int> getCurrentDimensions() const;
 
 private:
     std::vector<std::vector<int>> matrix; // 2D matrix representing the shape
     int posX = 4;
-    int posY = 0;
+    int posY = -1;
 	int rotation = 0;
     ShapeType type = ShapeType::I; // Enum representing the type (I, O, T, etc.)
 	std::vector<std::vector<std::vector<int>>> shapes{
 		{ // I
-		{0, 0, 0, 0},
-		{0, 0, 0, 0},
-		{0, 0, 0, 0},
-		{1, 1, 1, 1}
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0},
+		{0, 1, 0, 0}
 		},
 
 		{ // O
